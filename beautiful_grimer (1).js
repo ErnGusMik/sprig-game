@@ -2,10 +2,13 @@
 First time? Check out the tutorial game:
 https://sprig.hackclub.com/gallery/getting_started
 
-@title: 
-@author: 
-@tags: []
-@addedOn: 2024-00-00
+@title: Jumping banana
+@author: Ernests
+@tags: ['endless', 'dodge']
+@addedOn: 2024-07-06
+
+Movement:
+  w - jump
 */
 
 const player = "p"
@@ -66,7 +69,7 @@ CCCCCCCCCCCCCCCC` ],
 7777777777777777`],
 )
 
-setSolids([])
+setSolids([player])
 
 setBackground(background)
 
@@ -85,6 +88,10 @@ let levels = [
   .........
   `
 ]
+
+let running = true
+
+let count = 0
 
 setMap(levels[level])
 
@@ -117,6 +124,15 @@ const gameFunc = () => {
   setMap(updatedMap)
   getFirst(player).y = playerY 
 
+  count++;
+
+  clearText();
+  addText(count + '', {
+    x: 10,
+    y: 1,
+    color: color`2`
+  })
+
   if (tilesWith(ground, player).length > 0) {
     clearInterval(game)
     addText("Game over!", {
@@ -124,10 +140,27 @@ const gameFunc = () => {
       y: 4,
       color: color`3`
     })
+
+    addText("Press j to restart", {
+      x: 1,
+      y: 14,
+      color: color`D`
+    })
+    running = false
   }
 }
 
 let game = setInterval(gameFunc, 500)
+
+function checkFlag() {
+    if(getTile(0, playerY + 1).length > 0 && playerY != 4 && running) {
+       window.setTimeout(checkFlag, 50); /* this checks the flag every 100 milliseconds*/
+    } else {
+      playerY += 1
+      getFirst(player).y += 1
+    }
+}
+
 
 onInput("w", () => {
   if (getFirst(player).y == 0) {
@@ -137,15 +170,12 @@ onInput("w", () => {
   getFirst(player).y -= 1
 
   setTimeout(() => {
-    if (getTile(0, playerY + 1).length > 0) {
-      
-    }
-    playerY += 1
-    getFirst(player).y += 1
+    checkFlag()
   }, 1000)
 })
 
 onInput('j', () => {
+  running = true
   game = setInterval(gameFunc, 500)
   playerY = 4
   getFirst(player).y = 4
